@@ -1,6 +1,7 @@
-package com.pedrodev.pygol.constant;
+package com.pedrodev.pygol.scanner;
 
-public enum TokenType {
+public enum State {
+    INITIAL_STATE,
     INTEGER,
     REAL,
     LITERAL,
@@ -9,5 +10,4 @@ public enum TokenType {
     OPERATOR,
     KEYWORD,
     COMMENT
-
 }

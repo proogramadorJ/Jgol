@@ -1,8 +1,8 @@
 package com.pedrodev.pygol;
 
 import com.pedrodev.pygol.constant.CompilationStatus;
-import com.pedrodev.pygol.parser.Lexer;
-import com.pedrodev.pygol.parser.Token;
+import com.pedrodev.pygol.scanner.LexicalAnalyzer;
+import com.pedrodev.pygol.scanner.Token;
 
 import java.io.*;
 import java.util.List;
@@ -32,8 +32,8 @@ public class Compiler {
                 .status(CompilationStatus.COMPILATION_RUNNING)
                 .build();
 
-        Lexer lexer = new Lexer();
-        List<Token> tokenList = lexer.performLexicalAnalysis(process);
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
+        List<Token> tokenList = lexicalAnalyzer.performLexicalAnalysis(process);
 
         // TODO perform parser
         // TODO perform code generation
