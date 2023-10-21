@@ -19,32 +19,25 @@ public class LexicalAnalyzer {
         List<Token> tokens = new LinkedList<>();
         State state = INITIAL_STATE;
         char[] characters = compilationProcess.getSourceCode().toString().toCharArray();
-
+        StringBuilder lexeme = new StringBuilder();
         for (char c : characters) {
-            StringBuilder lexeme = new StringBuilder();
-
             switch (state) {
                 case INITIAL_STATE:
                     if (Character.isWhitespace(c))
                         continue;
+                    lexeme.append(c);
                     if (Character.isDigit(c)) {
                         state = INTEGER;
-                        lexeme.append(c);
                     } else if (c == '"') {
                         state = LITERAL;
-                        lexeme.append(c);
                     } else if (c == '#') {
                         state = COMMENT;
-                        lexeme.append(c);
                     } else if (LexerUtil.isDelimiter(c)) {
                         state = DELIMITER;
-                        lexeme.append(c);
                     } else if (LexerUtil.isOperator(c)) {
                         state = OPERATOR;
-                        lexeme.append(c);
                     } else {
                         state = IDENTIFIER;
-                        lexeme.append(c);
                     }
                     break;
 
@@ -57,7 +50,7 @@ public class LexicalAnalyzer {
                     } else {
                         tokens.add(new Token(TokenType.INTEGER, lexeme.toString()));
                         lexeme.setLength(0);
-                        if(!Character.isWhitespace(c))
+                        if (!Character.isWhitespace(c))
                             lexeme.append(c);
                         if (Character.isWhitespace(c)) {
                             state = INITIAL_STATE;
@@ -65,21 +58,121 @@ public class LexicalAnalyzer {
                             state = DELIMITER;
                         } else if (c == '#') {
                             state = COMMENT;
-                        }else if (LexerUtil.isOperator(c)) {
+                        } else if (LexerUtil.isOperator(c)) {
                             state = OPERATOR;
-                        }else if(c == '"'){
+                        } else if (c == '"') {
                             state = LITERAL;
-                        }else{
+                        } else {
                             state = IDENTIFIER;
                         }
                     }
-                        break;
+                    break;
 
                 case REAL:
-                    if(Character.isDigit(c)){
+                    if (Character.isDigit(c)) {
                         lexeme.append(c);
-                    }else{
+                    } else {
+                        tokens.add(new Token(TokenType.REAL, lexeme.toString()));
+                        lexeme.setLength(0);
+                        if (!Character.isWhitespace(c))
+                            lexeme.append(c);
+                        if (Character.isWhitespace(c)) {
+                            state = INITIAL_STATE;
+                        } else if (LexerUtil.isDelimiter(c)) {
+                            state = DELIMITER;
+                        } else if (c == '#') {
+                            state = COMMENT;
+                        } else if (LexerUtil.isOperator(c)) {
+                            state = OPERATOR;
+                        } else if (c == '"') {
+                            state = LITERAL;
+                        } else {
+                            state = IDENTIFIER;
+                        }
+                    }
+                    break;
 
+                case IDENTIFIER: // TODO implementar regra de KEYWORD
+                    if (Character.isLetterOrDigit(c) || c == '_') {
+                        lexeme.append(c);
+                    } else {
+                        tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString()));
+                        lexeme.setLength(0);
+                        if (!Character.isWhitespace(c))
+                            lexeme.append(c);
+                        if (Character.isWhitespace(c)) {
+                            state = INITIAL_STATE;
+                        } else if (LexerUtil.isDelimiter(c)) {
+                            state = DELIMITER;
+                        } else if (c == '#') {
+                            state = COMMENT;
+                        } else if (LexerUtil.isOperator(c)) {
+                            state = OPERATOR;
+                        } else if (c == '"') {
+                            state = LITERAL;
+                        }
+                    }
+                    break;
+
+                case LITERAL:
+                    lexeme.append(c);
+                    if (c == '"') {
+                        tokens.add(new Token(TokenType.LITERAL, lexeme.toString()));
+                        lexeme.setLength(0);
+                        state = INITIAL_STATE;
+                    }
+                    break;
+
+                case DELIMITER:
+                    tokens.add(new Token(TokenType.DELIMITER, lexeme.toString()));
+                    lexeme.setLength(0);
+                    if (!Character.isWhitespace(c))
+                        lexeme.append(c);
+                    if (Character.isWhitespace(c)) {
+                        state = INITIAL_STATE;
+                    } else if (c == '#') {
+                        state = COMMENT;
+                    } else if (LexerUtil.isOperator(c)) {
+                        state = OPERATOR;
+                    } else if (c == '"') {
+                        state = LITERAL;
+                    } else if (!LexerUtil.isDelimiter(c)) {
+                        state = IDENTIFIER;
+                    }
+                    break;
+
+                case OPERATOR:
+                    if (LexerUtil.isOperator(c)) {
+                        lexeme.append(c);
+                        state = INITIAL_STATE;
+                    }
+                    tokens.add(new Token(TokenType.OPERATOR, lexeme.toString()));
+                    lexeme.setLength(0);
+
+                    if (LexerUtil.isOperator(c))
+                        continue;
+                    if (!Character.isWhitespace(c))
+                        lexeme.append(c);
+                    if (Character.isWhitespace(c)) {
+                        state = INITIAL_STATE;
+                    } else if (LexerUtil.isDelimiter(c)) {
+                        state = DELIMITER;
+                    } else if (c == '#') {
+                        state = COMMENT;
+                    } else if (c == '"') {
+                        state = LITERAL;
+                    } else {
+                        state = IDENTIFIER;
+                    }
+                    break;
+
+                case COMMENT:
+                    if (c != '\n') {
+                        lexeme.append(c);
+                    } else {
+                        state = INITIAL_STATE;
+                        tokens.add(new Token(TokenType.COMMENT, lexeme.toString()));
+                        lexeme.setLength(0);
                     }
                     break;
             }
