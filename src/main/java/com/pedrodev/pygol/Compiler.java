@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Compiler {
 
-    public CompilationProcess compile(String inputFilePath, String outPutFilePath){
+    public CompilationProcess compile(String inputFilePath, String outPutFilePath) {
 
         File inputFile = new File(inputFilePath);
         StringBuilder buffer = new StringBuilder();
@@ -17,9 +17,18 @@ public class Compiler {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(inputFile));
             String codeLine;
-            while((codeLine = reader.readLine()) != null){
-                buffer.append(codeLine);
+            boolean firstLine = true;
+            while ((codeLine = reader.readLine()) != null) {
+                if (firstLine) {
+                    buffer.append(codeLine);
+                    firstLine = false;
+                } else {
+                    buffer.append("\n").append(codeLine);
+                }
+
+
             }
+            System.out.println("SOURCE CODE \n\n" + buffer.toString() + "\n\n");
         } catch (IOException e) {
             return CompilationProcess.builder()
                     .status(CompilationStatus.COMPILATION_FAILED_INPUT_FILE_NOT_ACCESSIBLE)
@@ -34,7 +43,9 @@ public class Compiler {
 
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
         List<Token> tokenList = lexicalAnalyzer.performLexicalAnalysis(process);
-
+        for (Token token : tokenList) {
+            System.out.println("TokenType: " + token.getType().name() + "\n" + "TokenValue: " + token.getValue());
+        }
         // TODO perform parser
         // TODO perform code generation
 
