@@ -2,7 +2,6 @@ package com.pedrodev.pygol.scanner;
 
 import com.pedrodev.pygol.CompilationProcess;
 import com.pedrodev.pygol.constant.TokenType;
-import com.pedrodev.pygol.scanner.util.LexerUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -96,7 +95,9 @@ public class LexicalAnalyzer {
                     if (Character.isLetterOrDigit(c) || c == '_') {
                         lexeme.append(c);
                     } else {
-                        tokens.add(new Token(TokenType.IDENTIFIER, lexeme.toString()));
+                        TokenType type = LexerUtil.isKeyword(lexeme.toString()) ? TokenType.KEYWORD : TokenType.IDENTIFIER;
+                        tokens.add(new Token(type, lexeme.toString()));
+
                         lexeme.setLength(0);
                         if (!Character.isWhitespace(c))
                             lexeme.append(c);
